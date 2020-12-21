@@ -74,6 +74,12 @@ class LoginViewController: UIViewController {
                                                             style: .done,
                                                             target: self,
                                                             action: #selector(didTapRegister))
+        loginButton.addTarget(self,
+                              action: #selector(loginButtonTapped),
+                              for: .touchUpInside)
+        
+        emailField.delegate = self
+        passwordField.delegate = self
         
         // Add Subviews
         view.addSubview(scrollView)
@@ -108,6 +114,27 @@ class LoginViewController: UIViewController {
                                    height: 52)
     }
     
+    @objc private func loginButtonTapped() {
+        guard let email = emailField.text, let password = passwordField.text,
+                  !email.isEmpty, !password.isEmpty, password.count >= 6 else {
+                    alertUserLoginError()
+                    return
+                  }
+        
+        //Firebase Log In
+    }
+    
+    func alertUserLoginError(){
+        let alert = UIAlertController(title: "woops",
+                                      message: "please enter all information to login.",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title:"Dismiss",
+                                      style: .cancel,
+                                      handler: nil))
+        present(alert, animated: true)
+    }
+    
+    
     @objc private func didTapRegister() {
         let vc = RegisterViewController()
         vc.title = "Create Account"
@@ -116,3 +143,19 @@ class LoginViewController: UIViewController {
     
 
 }
+
+extension LoginViewController: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        if textField == emailField {
+            passwordField.becomeFirstResponder()
+        }
+        else if textField == passwordField {
+            loginButtonTapped()
+        }
+        
+        return true
+    }
+}
+
