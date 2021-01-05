@@ -122,8 +122,6 @@ class LoginViewController: UIViewController {
                                    y: passwordField.bottom+10,
                                    width: scrollView.width-60,
                                    height: 52)
-
-
         facebookLoginButton.frame = CGRect(x: 30,
                                    y: loginButton.bottom+10,
                                    width: scrollView.width-60,
@@ -211,8 +209,8 @@ extension LoginViewController: LoginButtonDelegate {
         facebookRequest.start(completionHandler: { _, result, error in
             guard let result = result as? [String: Any],
                   error == nil else {
-                print("Failed to make facebook graaph request")
-                return
+                    print("Failed to make facebook graph request")
+                    return
             }
             
             guard  let userName = result["name"] as? String,
@@ -227,28 +225,28 @@ extension LoginViewController: LoginButtonDelegate {
             }
             
             let firstName = nameComponents[0]
-            let lastname = nameComponents[1]
+            let lastName = nameComponents[1]
             
             DatabaseManager.shared.userExists(with: email, completion: {exists in
                 if !exists {
                     DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName,
-                                                                        lastName: lastname,
+                                                                        lastName: lastName,
                                                                         emailAddress: email))
                 }
             })
             
             let credential = FacebookAuthProvider.credential(withAccessToken: token)
-            FirebaseAuth.Auth.auth().signIn(with: credential, completion: { [weak self] authResult, error in
-                guard let strongSelf = self else {
-                    return
-                }
-                
-                guard authResult != nil, error == nil else {
-                    if let error = error {
-                        print("Facebook credentials login failed, MFA may be needed - \(error)")
-                    }
-                    return
-                }
+                    FirebaseAuth.Auth.auth().signIn(with: credential, completion: { [weak self] authResult, error in
+                        guard let strongSelf = self else {
+                            return
+                        }
+                        
+                        guard authResult != nil, error == nil else {
+                            if let error = error {
+                                print("Facebook credentials login failed, MFA may be needed - \(error)")
+                            }
+                            return
+                        }
                 
                 print("Successfully logged user in")
                 strongSelf.navigationController?.dismiss(animated: true, completion: nil)
