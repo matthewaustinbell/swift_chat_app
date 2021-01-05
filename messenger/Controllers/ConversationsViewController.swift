@@ -20,13 +20,14 @@ class ConversationsViewController: UIViewController {
         
         validateAuth()
     }
+    
     private func validateAuth(){
         if FirebaseAuth.Auth.auth().currentUser == nil {
             let vc = LoginViewController()
             let nav = UINavigationController(rootViewController: vc)
             nav.modalPresentationStyle = .fullScreen
             present(nav, animated: false)
-            }
+        }
 
     }
 }
