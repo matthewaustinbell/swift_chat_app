@@ -10,8 +10,11 @@ import UIKit
 import FirebaseAuth
 import FBSDKLoginKit
 import GoogleSignIn
+import JGProgressHUD
 
 class LoginViewController: UIViewController {
+    
+    private let spinner = JGProgressHUD(style: )
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -168,6 +171,8 @@ class LoginViewController: UIViewController {
             return
         }
         
+        spinner.show(in: view)
+        
         // Firebase Log In
         FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authResult, error in
             guard let strongSelf = self else {
@@ -263,7 +268,7 @@ extension LoginViewController: LoginButtonDelegate {
                                         DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
                                             if success {
                                                 
-                                                guard let url = URL(string: pictureUrl) else {
+                                                guard let url = URL(string: pictureUrl)  else {
                                                     return
                                                 }
                                                 
@@ -277,22 +282,22 @@ extension LoginViewController: LoginButtonDelegate {
                                                     
                                                     print("got data from FB, uploading...")
                                                     
-                                                    // upload iamge
-                                                    let filename = chatUser.profilePictureFileName
-                                                    StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
-                                                        switch result {
-                                                        case .success(let downloadUrl):
-                                                            UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
-                                                            print(downloadUrl)
-                                                        case .failure(let error):
-                                                            print("Storage maanger error: \(error)")
-                                                        }
-                                                    })
-                                                }).resume()
-                                            }
-                                        })
+                                // upload iamge
+                                let filename = chatUser.profilePictureFileName
+                                StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
+                                    switch result {
+                                    case .success(let downloadUrl):
+                                        UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                        print(downloadUrl)
+                                        case .failure(let error):
+                                        print("Storage manger error: \(error)")
                                     }
                                 })
+                            }).resume()
+                        }
+                    })
+                }
+            })
             
             let credential = FacebookAuthProvider.credential(withAccessToken: token)
             FirebaseAuth.Auth.auth().signIn(with: credential, completion: { [weak self] authResult, error in
