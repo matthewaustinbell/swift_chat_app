@@ -14,7 +14,7 @@ import JGProgressHUD
 
 class LoginViewController: UIViewController {
     
-    private let spinner = JGProgressHUD(style: )
+    private let spinner = JGProgressHUD(style: .dark)
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -260,28 +260,28 @@ extension LoginViewController: LoginButtonDelegate {
                                 }
                                 
                                 
-                                DatabaseManager.shared.userExists(with: email, completion: { exists in
-                                    if !exists {
-                                        let chatUser = ChatAppUser(firstName: firstName,
-                                                                   lastName: lastName,
-                                                                   emailAddress: email)
-                                        DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
-                                            if success {
-                                                
-                                                guard let url = URL(string: pictureUrl)  else {
-                                                    return
-                                                }
-                                                
-                                                print("Downloading data from facebook image")
-                                                
-                                                URLSession.shared.dataTask(with: url, completionHandler: { data, _,_ in
-                                                    guard let data = data else {
-                                                        print("Failed to get data from facebook")
-                                                        return
-                                                    }
-                                                    
-                                                    print("got data from FB, uploading...")
-                                                    
+            DatabaseManager.shared.userExists(with: email, completion: { exists in
+                if !exists {
+                    let chatUser = ChatAppUser(firstName: firstName,
+                                               lastName: lastName,
+                                               emailAddress: email)
+                    DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
+                        if success {
+                            
+                            guard let url = URL(string: pictureUrl)  else {
+                                return
+                            }
+                            
+                            print("Downloading data from facebook image")
+                            
+                            URLSession.shared.dataTask(with: url, completionHandler: { data, _,_ in
+                                guard let data = data else {
+                                    print("Failed to get data from facebook")
+                                    return
+                                }
+                                
+                                print("got data from FB, uploading...")
+                                
                                 // upload iamge
                                 let filename = chatUser.profilePictureFileName
                                 StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
@@ -289,7 +289,7 @@ extension LoginViewController: LoginButtonDelegate {
                                     case .success(let downloadUrl):
                                         UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
                                         print(downloadUrl)
-                                        case .failure(let error):
+                                    case .failure(let error):
                                         print("Storage manger error: \(error)")
                                     }
                                 })
@@ -299,6 +299,8 @@ extension LoginViewController: LoginButtonDelegate {
                 }
             })
             
+            // upload iamge
+                           
             let credential = FacebookAuthProvider.credential(withAccessToken: token)
             FirebaseAuth.Auth.auth().signIn(with: credential, completion: { [weak self] authResult, error in
                 guard let strongSelf = self else {
